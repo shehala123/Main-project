@@ -1,0 +1,42 @@
+{% extends 'adminindex.html' %}
+{% block body %}
+
+<body>
+<div align="center">
+  <table width="100" height="156" border="1"  id="customers">
+    <tr>
+      <th width="95"><div align="center">Fname</div></th>
+      <th width="95"><div align="center">Lname</div></th>
+      <th width="95"><div align="center">Gender</div></th>
+      <th width="96"><div align="center">Dob</div></th>
+      <th width="94"><div align="center">Place</div></th>
+      <th width="95"><div align="center">Post</div></th>
+      <th width="95"><div align="center">Pin</div></th>
+      <th width="95"><div align="center">Phone</div></th>
+      <th width="101"><div align="center">Email</div></th>
+      <th width="101">&nbsp;</th>
+    </tr>
+     {%  for i in val %}
+    <tr>
+      <td>{{i[2]}}</td>
+      <td>{{i[3]}}</td>
+      <td>{{i[4]}}</td>
+      <td>{{i[5]}}</td>
+      <td>{{i[6]}}</td>
+      <td>{{i[7]}}</td>
+      <td>{{i[8]}}</td>
+      <td>{{i[9]}}</td>
+      <td>{{i[10]}}</td>
+      <td><a href="Accept_caretaker?id={{i[1]}}">Accept</a><br>
+        <a href="Reject_caretaker?id={{i[1]}}">Reject</a>
+      </td>
+    </tr>
+    {% endfor %}
+
+  </table>
+</div>
+<div align="center"></div>
+<div align="center"></div>
+</body>
+
+{% endblock %}
