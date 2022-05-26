@@ -1,0 +1,99 @@
+{% extends 'blindmanageindex.html' %}
+{% block body %}
+<body>
+<form id="form1" name="form1" method="post" action="add_blinds">
+  <div style="width:50%" align="center">
+    <h1>Blind Registration</h1>
+    <table width="352" border="1" id="customers">
+      <tr>
+        <th width="125"><div align="center">First name : </div></th>
+        <td width="125">
+          <input type="text" name="textfield2" class="form-control" required />
+        </td>
+      </tr>
+      <tr>
+        <th><p align="center">Last name : </p>        </th>
+        <td>
+          
+
+            <input type="text" name="textfield" class="form-control" required/>
+
+        </td>
+      </tr>
+      <tr>
+        <th><div align="center">Gender : </div></th>
+        <td>
+          <div align="center">
+            <input type="radio" required checked name="radiobutton" value="Male">Male &nbsp;&nbsp; <input type="radio" name="radiobutton" value="Female">Female
+            </div>
+      </td>
+      </tr>
+      <tr>
+        <th><div align="center">Dob : </div></th>
+        <td>
+          <div align="center">
+            <input type="date" min="1990-01-01" max="2015-12-31" name="textfield4" class="form-control" required />
+            </div>
+        </td>
+      </tr>
+      <tr>
+        <th><div align="center">Place : </div></th>
+        <td>
+          <div align="center">
+            <input type="text" name="textfield5" class="form-control" required />
+            </div>
+        </td>
+      </tr>
+      <tr>
+        <th><div align="center">Post : </div></th>
+        <td>
+          <div align="center">
+            <input type="text" name="textfield6"  class="form-control" required/>
+            </div>
+        </td>
+      </tr>
+      <tr>
+        <th><div align="center">Pin code : </div></th>
+        <td>
+          <div align="center">
+            <input type="text" name="textfield7" class="form-control" required/>
+            </div>
+        </td>
+      </tr>
+      <tr>
+        <th><div align="center">Phone no : </div></th>
+        <td>
+          <div align="center">
+            <input type="text" name="textfield8" class="form-control" required/>
+            </div>
+        </td>
+      </tr>
+      <tr>
+        <th><div align="center">IMEI No: </div></th>
+        <td>
+          <div align="center">
+            <input type="text" name="textfield9" class="form-control" required/>
+            </div>
+        </td>
+      </tr>
+      <!--<tr>-->
+        <!--<th><div align="center">Care_id</div></th>-->
+        <!--<td><div align="center">-->
+          <!--<label>-->
+          <!--<input type="text" name="textfield10" />-->
+          <!--</label>-->
+        <!--</div></td>-->
+      <!--</tr>-->
+      <tr>
+        <td colspan="2">
+          <div align="center">
+            <input type="submit" name="Submit" value="REGISTER " class="btn btn-primary" />
+            </div>
+        </td>
+      </tr>
+      </table>
+  </div>
+  <div align="center"></div>
+</form>
+</body>
+{% endblock %}

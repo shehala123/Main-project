@@ -1,0 +1,39 @@
+<!--<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">-->
+<!--<html xmlns="http://www.w3.org/1999/xhtml">-->
+<!--<head>-->
+<!--<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />-->
+<!--<title>view_blinds</title>-->
+<!--</head>-->
+{% extends 'adminindex.html' %}
+{% block body %}
+<body>
+<form id="form1" name="form1" method="post" action="">
+  <div align="center">
+    <table width="843" height="99" border="1" id="customers">
+      <tr>
+        <th width="107"><div align="center"> Name </div></th>
+        <th width="92"><div align="center">Gender</div></th>
+        <th width="52"><div align="center">Dob</div></th>
+        <th width="77"><div align="center">Address</div></th>
+        <th width="124"><div align="center">Phone</div></th>
+        <th width="102"><div align="center">IMEI _NO </div></th>
+        <th width="102"><div align="center">CARETAKER </div></th>
+      </tr>
+       {%  for i in val %}
+      <tr>
+        <td> <div align="center"> {{i[1]}} {{i[2]}}</div></td>
+          <td>  <div align="center">{{i[3]}}</div></td>
+          <td> <div align="center">{{i[4]}}</div></td>
+          <td> <div align="center"> {{i[5]}}<br> {{i[6]}} <br>{{i[7]}}</div></td>
+          <td>  <div align="center">{{i[8]}}</div></td>
+          <td> <div align="center"> {{i[9]}}</div></td>
+          <td> <div align="center"> {{i[11]}} {{i[12]}}</div></td>
+
+      </tr>
+        {% endfor %}
+      </table>  
+  </div>
+  <div align="center"></div>
+</form>
+</body>
+{% endblock %}
