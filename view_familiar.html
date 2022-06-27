@@ -1,0 +1,38 @@
+{% extends 'blindmanageindex.html' %}
+{% block body %}
+
+<body>
+<form id="form1" name="form1" method="post" action="add_familiar#services">
+  <div align="center">
+    <H2><B>FAMILIAR PERSONS</B></H2>
+    <table width="250" height="150" border="1" id="customers">
+      <tr>
+        <th width="74"><div align="center">Blind name </div></th>
+        <th width="61"><div align="center">Name</div></th>
+        <th width="67"><div align="center">Image</div></th>
+        <th width="81"><div align="center">Relation</div></th>
+        <th width="71" colspan="5">&nbsp;</th>
+      </tr>
+       {%  for i in val %}
+      <tr>
+        <td>{{i[0]}} {{i[1]}}</td>
+        <td>{{i[4]}}</td>
+        <td>&nbsp;<img src="static/familiar person/{{i[5]}}" height="200" width="200"></td>
+        <td>&nbsp;{{i[6]}}</td>
+         <td><p><a href="editfamiliar?id={{i[2]}}">Edit</a></p><br>
+        <p><a href="deletefamiliar?id={{i[2]}}">Delete</a></p></td>
+      </tr>
+      {% endfor %}
+      <tr>
+        <td colspan="5">
+          <div align="center">
+            <input type="submit" name="Submit" value="ADD" class="btn btn-primary" />
+            </div>
+      </td>
+      </tr>
+      </table>  
+  </div>
+  <div align="center"></div>
+</form>
+</body>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'blindmanageindex.html' %}
+{% block body %}
+
+<body>
+<form action="add_familiar1" method="post" enctype="multipart/form-data" name="form1" id="customers">
+  <div align="center">
+    <table width="478" border="1">
+      <H2><B>ADD FAMILIAR PERSON</B></H2>
+      <tr>
+        <th width="115"><div align="center">Blind Name : </div></th>
+        <td width="347"><label>
+          <div align="center">
+            <select name="select">
+              {% for i in val %}
+              <option value="{{i[0]}}">{{i[1]}} {{i[2]}}</option>
+              {% endfor %}
+            </select>
+            </div>
+        </label></td>
+      </tr>
+      <tr>
+        <th><div align="center">Name : </div></th>
+        <td><label>
+          <input type="text" name="textfield" />
+        </label></td>
+      </tr>
+      <tr>
+        <th><div align="center">Image : </div></th>
+        <td><label>
+          <input type="file" name="file" />
+        </label></td>
+      </tr>
+      <tr>
+        <th><div align="center">Relation : </div></th>
+        <td><label>
+          <input type="text" name="textfield2" />
+        </label></td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <div align="center">
+            <input type="submit" name="Submit" />
+          </div>
+        </td>
+      </tr>
+      </table>
+  </div>
+</form>
+</body>
+{% endblock %}

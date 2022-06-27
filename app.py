@@ -3,6 +3,7 @@ from flask import *
 from werkzeug.utils import secure_filename
 
 from src.dbconnection import *
+
 app = Flask(__name__)
 app.secret_key='aa'
 @app.route('/')
@@ -43,7 +44,11 @@ def reject_caretaker():
 
 @app.route('/care_homepage')
 def care_homepage():
-    return render_template("care homepage.html")
+    loginID = session['lid']
+    qry = "SELECT Fname,Lname FROM  `care_registration` WHERE `login_id`= %s "
+    res = selectone(qry, loginID)
+    name = res[0]+" "+res[1]
+    return render_template("care homepage.html",name=name)
 
 
 @app.route('/loginform',methods=['POST'])
@@ -155,8 +160,8 @@ def blind_add():
 
 @app.route('/view_blind')
 def view_blinds():
-    qry="select * from blind_reg"
-    res=selectall(qry)
+    qry="select * from blind_reg where C_id=%s"
+    res=selectall2(qry,session['lid'])
     return render_template("blind.html",val=res)
 
 # @app.route('/', methods=['post'])
@@ -175,9 +180,13 @@ def approvedcaretaker():
 
 @app.route('/viewblinds')
 def viewblinds():
-    qry="SELECT blind_reg.*,`care_registration`.`Fname`,`care_registration`.`Lname` FROM blind_reg JOIN `care_registration` ON `blind_reg`.`C_id`=`care_registration`.`login_id`"
+    qry="SELECT * FROM `care_registration` WHERE `Status`='accepted'"
     res=selectall(qry)
-    return render_template("view_blinds.html",val=res)
+    # qry="SELECT blind_reg.*,`care_registration`.`Fname`,`care_registration`.`Lname` FROM blind_reg JOIN `care_registration` ON `blind_reg`.`C_id`=`care_registration`.`login_id`"
+    # res=selectall(qry)
+    qry1 = "SELECT * FROM `blind_reg`"
+    res1 = selectall(qry1)
+    return render_template("view_blinds.html",val=res,v=res1)
 
 
 
@@ -289,6 +298,30 @@ def delete_blind():
     qry="DELETE FROM `blind_reg` WHERE B_id=%s"
     iud(qry,id)
     return '''<script>alert('DELETED!');window.location='/view_blind'</script>'''
+
+@app.route('/search_blinds',methods=["post"])
+def search_blinds():
+    name=request.form['select']
+    qry="SELECT * FROM `blind_reg` WHERE `C_id` = %s"
+    res=selectall2(qry,name)
+    qry1="SELECT * FROM `care_registration` WHERE `Status`='accepted'"
+    res1=selectall(qry1)
+    return render_template("view_blinds.html",v=res,val=res1,s=name)
+@app.route('/send_complaints',methods=["get"])
+def send_complaints():
+
+    return render_template("Send_complaints.html")
+
+
+@app.route('/send_comp',methods=["post"])
+def send_comp():
+    complaint=request.form['textarea']
+    qry="INSERT INTO `complaints`VALUES(NULL,%s,%s,CURDATE(),'pending')"
+    val=(session['lid'],complaint)
+    iud(qry,val)
+    return '''<script>alert('SENDED!');window.location='/'</script>'''
+
+
 
 
 

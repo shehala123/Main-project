@@ -1,0 +1,29 @@
+{% extends 'caretakerindex.html' %}
+{% block body %}
+
+
+<body>
+<form id="form1" name="form1" method="post" action="send_comp" >
+  <div align="center">
+    <h2>COMPLAINTS</h2>
+    <table width="400" border="1" id="customers">
+      <tr>
+        <td>Complaint:</td>
+        <td><label>
+          <textarea name="textarea" class="form-control"></textarea>
+        </label></td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <div align="center">
+            <input type="submit" name="Submit" value="SEND" class="btn btn-primary"  />
+            </div>
+        </td>
+      </tr>
+      </table>  
+  </div>
+  <div align="center"></div>
+</form>
+</body>
+{% endblock %}
+
