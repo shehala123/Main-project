@@ -1,0 +1,30 @@
+{% extends 'caretakerindex.html' %}
+{% block body %}
+
+<body>
+<form id="form1" name="form1" method="post" action="send_complaints">
+    <h2>Response</h2>
+  <div align="center">
+    <table width="318" border="1" id="customers">
+         <tr><td colspan="3"><input type="submit" value="Add New"></td></tr>
+      <tr>
+        <td width="48">Date</td>
+        <td width="54">Complaint</td>
+        <td width="91">Reply</td>
+
+      </tr>
+
+{% for i in val %}
+         <tr>
+        <td width="48">{{i[5]}}</td>
+        <td width="54">{{i[2]}}</td>
+        <td width="91">{{i[4]}}</td>
+      </tr>
+{% endfor %}
+
+
+      </table>
+  </div>
+</form>
+</body>
+{% endblock %}

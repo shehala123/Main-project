@@ -99,5 +99,58 @@ def getvolphone():
     else:
         return jsonify({'volphone': "8590494466"})
 
+@app.route('/updateloc', methods=['POST'])
+def updateloc():
+    try:
+        print(request.form)
+        imei = request.form['imei']
+        latt = request.form['latt']
+        long = request.form['long']
 
-app.run(host="0.0.0.0",port=5000)
+        print(long)
+        print(imei)
+        qry = 'SELECT b_id FROM `blind_reg` WHERE `IMEI_NO`=%s'
+        res = selectone(qry, (str(imei),))
+        print(res)
+        qry="select * from location WHERE  `B_id`=%s"
+        val = (str(res[0]))
+
+        ss=selectone(qry,val)
+        print("ss",ss)
+        if ss is None:
+            print("okkkkkkkkkkkkkkkkkkkkkkkk")
+            qry = 'insert into location  values(null,%s,%s,%s)'
+            val = ( str(res[0]),str(latt), str(long))
+            iud(qry, val)
+            return jsonify({"task":"ok"})
+        else:
+            # long="433443"
+
+
+            print("alrdyyyyyyyyyyyy")
+            query="select * from location WHERE B_id=%s and Latitude=%s and Longitude=%s "
+            val = (str(res[0]), str(latt), str(long))
+            sss=selectone(query,val)
+            print(val)
+            if sss is  None:
+                print("latiiiiiiiilongii")
+
+
+
+
+                qry = 'UPDATE `location` SET `Latitude`=%s, `Longitude`=%s WHERE `B_id`=%s'
+                val = (str(latt), str(long), str(res[0]))
+                iud(qry, val)
+
+                result= select(query, val)
+                print ("result",result)
+
+                return jsonify({"task": "ok"})
+        return jsonify({"task": "ok"})
+
+
+    except Exception as e:
+        print(e)
+        return jsonify({"task":"error"})
+
+`

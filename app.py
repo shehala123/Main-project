@@ -4,8 +4,33 @@ from werkzeug.utils import secure_filename
 
 from src.dbconnection import *
 
+import smtplib
+from email.mime.text import MIMEText
+from flask_mail import Mail
+
+
+
 app = Flask(__name__)
 app.secret_key='aa'
+
+# mail=Mail(app)
+# app.config['MAIL_SERVER']='smtp.gmail.com'
+# app.config['MAIL_PORT'] = 587
+# app.config['MAIL_USERNAME'] = 'Insightblind364@gmail.com'
+# app.config['MAIL_PASSWORD'] = 'mails2020'
+# app.config['MAIL_USE_TLS'] = False
+# app.config['MAIL_USE_SSL'] = True
+import functools
+
+def login_required(func):
+    @functools.wraps(func)
+    def secure_function():
+        if "lid" not in session:
+            return render_template('log.html')
+        return func()
+
+    return secure_function
+
 @app.route('/')
 def login():
     return render_template("index.html")
@@ -22,11 +47,13 @@ def homepage():
 def Caretaker_registration():
     return render_template("caretaker registration.html")
 @app.route('/view & approve caretaker')
+@login_required
 def viewapprove_caretaker():
-    qry="SELECT `care_registration`. *, `login`.`usertype`FROM`care_registration` JOIN `login` ON `login`.`login_id` = `care_registration`.`login_id` WHERE`login`.`usertype` = 'Pending'"
+    qry="SELECT `care_registration`. *, `login`.`usertype`,DATE_FORMAT(Dob,'%d-%m-%Y') FROM`care_registration` JOIN `login` ON `login`.`login_id` = `care_registration`.`login_id` WHERE`login`.`usertype` = 'Pending'"
     res=selectall(qry)
     return render_template("view & approve caretaker.html",val=res)
 @app.route('/Accept_caretaker')
+@login_required
 def accept_caretaker():
     id=request.args.get('id')
     qry="UPDATE `login` SET `usertype`='caretaker' WHERE `login_id`=%s"
@@ -35,6 +62,7 @@ def accept_caretaker():
            window.location='/'</script>'''
 
 @app.route('/Reject_caretaker')
+@login_required
 def reject_caretaker():
     id = request.args.get('id')
     qry = "UPDATE `login` SET `usertype`='reject' WHERE `login_id`=%s"
@@ -43,6 +71,7 @@ def reject_caretaker():
            window.location='/'</script>'''
 
 @app.route('/care_homepage')
+@login_required
 def care_homepage():
     loginID = session['lid']
     qry = "SELECT Fname,Lname FROM  `care_registration` WHERE `login_id`= %s "
@@ -73,6 +102,7 @@ def loginform():
                 window.location='/'</script>'''
 
 @app.route('/care_registration',methods=['post'])
+@login_required
 def care_registration():
     Fname = request.form['textfield']
     Lname = request.form['textfield2']
@@ -102,13 +132,15 @@ def care_registration():
 
 
 @app.route('/profile_update')
+@login_required
 def profile_update():
     lid=session['lid']
-    qry="SELECT * FROM `care_registration` WHERE `login_id`=%s"
-    res=selectone(qry,lid)
+    qry="SELECT * ,DATE_FORMAT(Dob,'%d-%m-%Y') FROM `care_registration` WHERE `login_id`='"+str(lid)+"'"
+    res=selectone1(qry)
     return render_template("update_profile.html",val=res)
 
 @app.route('/update',methods=['post'])
+@login_required
 def update():
     Fname = request.form['textfield']
     Lname = request.form['textfield2']
@@ -129,18 +161,21 @@ def update():
                window.location='/profile_update'</script>'''
 
 @app.route('/blind_registration', methods=['post','get'])
+@login_required
 def blind_reg():
     return render_template("blind_registration.html")
 
 
 
 @app.route('/blind_index')
+@login_required
 def blind_ind():
     return render_template("blindmanageindex.html")
 
 
 
 @app.route('/add_blinds',methods=['post'])
+@login_required
 def blind_add():
     Fname = request.form['textfield2']
     Lname = request.form['textfield']
@@ -150,18 +185,20 @@ def blind_add():
     Post = request.form['textfield6']
     Pin = request.form['textfield7']
     Phone = request.form['textfield8']
-
     IMEI=request.form['textfield9']
     qry="INSERT INTO `blind_reg` VALUES(NULL,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
     val=(Fname,Lname,Gender,DOB,Place,Post,Pin,Phone,IMEI,session['lid'])
     iud(qry,val)
-
     return '''<script>alert('Registration Succesfull!');window.location='/view_blind'</script>'''
 
 @app.route('/view_blind')
+@login_required
 def view_blinds():
-    qry="select * from blind_reg where C_id=%s"
-    res=selectall2(qry,session['lid'])
+
+    qry="select blind_reg.*,DATE_FORMAT(Dob,'%d-%m-%Y') from blind_reg where C_id='"+str(session['lid'])+"'"
+    # res=selectall2(qry,session['lid'])
+    res=selectall(qry)
+    print(res,"============================================")
     return render_template("blind.html",val=res)
 
 # @app.route('/', methods=['post'])
@@ -169,8 +206,9 @@ def view_blinds():
 #     return render_template("update_profile.html")
 
 @app.route('/view approved caretaker')
+@login_required
 def approvedcaretaker():
-    qry="SELECT `care_registration`. *, `login`.`usertype`FROM`care_registration` JOIN `login` ON `login`.`login_id` = `care_registration`.`login_id` WHERE`login`.`usertype` = 'caretaker'"
+    qry="SELECT `care_registration`. *, `login`.`usertype`,DATE_FORMAT(care_registration.Dob,'%d-%m-%Y')FROM`care_registration` JOIN `login` ON `login`.`login_id` = `care_registration`.`login_id` WHERE`login`.`usertype` = 'caretaker'"
     res=selectall(qry)
     return render_template("view approved caretaker.html",val=res)
 
@@ -179,18 +217,21 @@ def approvedcaretaker():
 
 
 @app.route('/viewblinds')
+@login_required
 def viewblinds():
     qry="SELECT * FROM `care_registration` WHERE `Status`='accepted'"
     res=selectall(qry)
     # qry="SELECT blind_reg.*,`care_registration`.`Fname`,`care_registration`.`Lname` FROM blind_reg JOIN `care_registration` ON `blind_reg`.`C_id`=`care_registration`.`login_id`"
     # res=selectall(qry)
-    qry1 = "SELECT * FROM `blind_reg`"
+    qry1 = "SELECT *,DATE_FORMAT(Dob,'%d-%m-%Y')FROM `blind_reg`"
     res1 = selectall(qry1)
     return render_template("view_blinds.html",val=res,v=res1)
 
 
 
 @app.route('/add_familiar',methods=['post'])
+@login_required
+
 def addfamiliar():
     qry="SELECT * FROM `blind_reg` WHERE `C_id`=%s"
     res=selectall2(qry,session['lid'])
@@ -199,13 +240,37 @@ def addfamiliar():
     return render_template("Add_familiar_person.html",val=res)
 
 @app.route('/view_familiar')
+@login_required
 def viewfamilar():
-    qry = "SELECT `blind_reg`.`Fname`,`blind_reg`.`Lname`,`familiar_person`.* FROM `familiar_person` JOIN `blind_reg` ON `blind_reg`.B_id=`familiar_person`.B_id"
-    res = selectall(qry)
+
+    qry="SELECT `blind_reg`.* FROM `blind_reg` WHERE `C_id`=%s"
+    res=selectall2(qry,session['lid'])
+
+
     return render_template("view_familiar.html",val=res)
 
 
+
+
+@app.route('/view_familiar1',methods=['post'])
+@login_required
+def viewfamilar1():
+    blind = request.form['select']
+    qry="SELECT `blind_reg`.* FROM `blind_reg` WHERE `C_id`=%s"
+    res=selectall2(qry,session['lid'])
+    qry = "SELECT `familiar_person`.* FROM `familiar_person` WHERE `B_id`=%s "
+    res1 = selectall2(qry,blind)
+    return render_template("view_familiar.html",val=res,val1=res1,s=blind)
+
+
+
+
+
+
+
+
 @app.route('/add_familiar1',methods=['post'])
+@login_required
 def addfamiliar1():
     BlindName = request.form['select']
     Name = request.form['textfield']
@@ -221,6 +286,7 @@ def addfamiliar1():
 
 
 @app.route('/editblind')
+@login_required
 def edit_blind():
     id=request.args.get('id')
     session['eid']=id
@@ -230,6 +296,7 @@ def edit_blind():
 
 
 @app.route('/updateblind',methods=["post"])
+@login_required
 def update_blind():
     Fname = request.form['textfield2']
     Lname = request.form['textfield']
@@ -249,6 +316,7 @@ def update_blind():
 
 
 @app.route('/editfamiliar')
+@login_required
 def edit_familiar():
     qry = "SELECT * FROM `blind_reg` WHERE `C_id`=%s"
     res1 = selectall2(qry, session['lid'])
@@ -260,6 +328,7 @@ def edit_familiar():
     return render_template("editfamiliarperson.html",val=res,val1=res1)
 
 @app.route('/updatefamiliar',methods=["post"])
+@login_required
 def update_familiar():
     try:
         BlindName = request.form['select']
@@ -285,6 +354,7 @@ def update_familiar():
         return redirect("view_familiar")
 
 @app.route('/deletefamiliar')
+@login_required
 def delete_familiar():
     id=request.args.get('id')
     qry="DELETE FROM `familiar_person` WHERE f_id=%s"
@@ -293,6 +363,7 @@ def delete_familiar():
 
 
 @app.route('/deleteblind')
+@login_required
 def delete_blind():
     id=request.args.get('id')
     qry="DELETE FROM `blind_reg` WHERE B_id=%s"
@@ -300,6 +371,7 @@ def delete_blind():
     return '''<script>alert('DELETED!');window.location='/view_blind'</script>'''
 
 @app.route('/search_blinds',methods=["post"])
+@login_required
 def search_blinds():
     name=request.form['select']
     qry="SELECT * FROM `blind_reg` WHERE `C_id` = %s"
@@ -307,21 +379,112 @@ def search_blinds():
     qry1="SELECT * FROM `care_registration` WHERE `Status`='accepted'"
     res1=selectall(qry1)
     return render_template("view_blinds.html",v=res,val=res1,s=name)
-@app.route('/send_complaints',methods=["get"])
+@app.route('/viewreply')
+@login_required
+def viewreply():
+    qry="select *,DATE_FORMAT(complaints.date,'%d-%m-%y') from complaints where care_id="+str(session['lid'])
+    res=selectall(qry)
+
+    return render_template("viewreply.html",val=res)
+
+
+@app.route('/send_complaints',methods=["post"])
+@login_required
 def send_complaints():
 
     return render_template("Send_complaints.html")
 
 
+
 @app.route('/send_comp',methods=["post"])
+@login_required
 def send_comp():
     complaint=request.form['textarea']
     qry="INSERT INTO `complaints`VALUES(NULL,%s,%s,CURDATE(),'pending')"
     val=(session['lid'],complaint)
     iud(qry,val)
-    return '''<script>alert('SENDED!');window.location='/'</script>'''
+    return '''<script>alert('SENDED!');window.location='/viewreply'</script>'''
 
 
+@app.route('/location',methods=["post",'get'])
+@login_required
+def loc():
+    qry="SELECT `blind_reg`.`Fname`,`Lname`,`location`.`Latitude`,`Longitude` FROM `location` JOIN `blind_reg` ON `blind_reg`.`B_id`=`location`.`B_id` WHERE `blind_reg`.`C_id`=%s"
+    res=selectall2(qry,session['lid'])
+    return render_template("location.html",val=res)
+
+@app.route('/view')
+@login_required
+def view_com():
+    qry= "SELECT `complaints`.* ,`care_registration`.`Fname`,`care_registration`.`Lname`,DATE_FORMAT(complaints.date,'%d-%m-%y') FROM `care_registration` JOIN `complaints` ON `care_registration`.`login_id`= `complaints`.`care_id` WHERE `complaints`.`reply`='pending'"
+    res=selectall(qry)
+    print(res,"==========================")
+    return render_template("view_complints_admin.html",val=res)
+
+@app.route('/send_reply')
+@login_required
+def send_reply():
+    id=request.args.get('id')
+    session['cid']=id
+    return render_template("send_reply.html")
+
+@app.route('/sending_reply',methods=['post'])
+@login_required
+def sending_reply():
+
+    reply=request.form['textarea']
+    qry="UPDATE `complaints` SET reply=%s WHERE `complaint_id`=%s"
+    val=(reply,session['cid'])
+    iud(qry,val)
+
+    return redirect("view")
+
+@app.route('/forgot')
+
+def forgot():
+
+    return render_template("forgot.html")
+
+@app.route('/forgotpassword1',methods=['post'])
+
+def forgotpassword1():
+    print(request.form)
+    try:
+        print(request.form)
+        email = request.form['textfield']
+        print(email)
+        qry = "SELECT `login`.`password` FROM `login` JOIN `care_registration` ON `login`.`login_id`=`care_registration`.`login_id` WHERE `care_registration`.`Email`=%s"
+        s = selectone(qry, email)
+        print(s, "=============")
+        if s is None:
+            return '''<script>alert('invalid!');window.location='/'</script>'''
+        else:
+            try:
+                gmail = smtplib.SMTP('smtp.gmail.com', 587)
+                gmail.ehlo()
+                gmail.starttls()
+                gmail.login('insightblind364@gmail.com', 'iuhjzrfyoembxhcs')
+            except Exception as e:
+                print("Couldn't setup email!!" + str(e))
+            msg = MIMEText("Your new password is : " + str(s[0]))
+            print(msg)
+            msg['Subject'] = 'INSIGHT'
+            msg['To'] = email
+            msg['From'] = 'insightblind364@gmail.com'
+            try:
+                gmail.send_message(msg)
+            except Exception as e:
+                print("COULDN'T SEND EMAIL", str(e))
+            return '''<script>alert("SEND"); window.location="/"</script>'''
+    except:
+        return '''<script>alert("PLEASE ENTER VALID DETAILS"); window.location="/"</script>'''
+
+
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect('/log')
 
 
 
